@@ -3,5 +3,5 @@
 
 ## Hist matching and face swap
 
-## Pose estimat
+## Pose estimate
 
