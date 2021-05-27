@@ -1,5 +1,5 @@
 # Face parsing via BiSeNet
-[./imgs/parsing.png]
+![semantic segmentation masks](./imgs/parsing.png)
 Use a BiSeNet pretrained model to extract face semantic segmentation masks, correct errors at ears, eyebrows or eyes, and crop face region below eyebrows.
 
 ## References
