@@ -7,7 +7,7 @@ from get_pair_parsing2 import *
 import os.path as osp
 
 
-
+#================================= hist matching ================================
 def calculate_cdf(histogram):
     """
     This method calculates the cumulative distribution function
@@ -58,24 +58,7 @@ def match_histograms(src_image, ref_image, mask_src, mask_ref):
     src_b, src_g, src_r = cv2.split(src_image)
     ref_b, ref_g, ref_r = cv2.split(ref_image)
 
-    # Compute the b, g, and r histograms separately
-    # The flatten() Numpy method returns a copy of the array c
-    # collapsed into one dimension.
-    # src_hist_blue, bin_0 = np.histogram(src_b.flatten(), 256, [0, 256])
-    # src_hist_green, bin_1 = np.histogram(src_g.flatten(), 256, [0, 256])
-    # src_hist_red, bin_2 = np.histogram(src_r.flatten(), 256, [0, 256])
-    # ref_hist_blue, bin_3 = np.histogram(ref_b.flatten(), 256, [0, 256])
-    # ref_hist_green, bin_4 = np.histogram(ref_g.flatten(), 256, [0, 256])
-    # ref_hist_red, bin_5 = np.histogram(ref_r.flatten(), 256, [0, 256])
-
-    # src_hist_blue = cv2.calcHist([src_image], [0], mask_src, [256], [0, 256])  # 256
-    # src_hist_green = cv2.calcHist([src_image], [1], mask_src, [256], [0, 256])
-    # src_hist_red = cv2.calcHist([src_image], [2], mask_src, [256], [0, 256])
-    # ref_hist_blue = cv2.calcHist([ref_image], [0], mask_ref, [256], [0, 256])
-    # ref_hist_green = cv2.calcHist([ref_image], [1], mask_ref, [256], [0, 256])
-    # ref_hist_red = cv2.calcHist([ref_image], [2], mask_ref, [256], [0, 256])
-
-    src_hist_blue = cv2.calcHist([src_image], [0], mask_src, [256], [0, 256])  # 256
+    src_hist_blue = cv2.calcHist([src_image], [0], mask_src, [256], [0, 256])  
     src_hist_green = cv2.calcHist([src_image], [1], mask_src, [256], [0, 256])
     src_hist_red = cv2.calcHist([src_image], [2], mask_src, [256], [0, 256])
     ref_hist_blue = cv2.calcHist([ref_image], [0], mask_ref, [230], [0, 230])
@@ -111,12 +94,6 @@ def match_histograms(src_image, ref_image, mask_src, mask_ref):
 
     mask_blur = cv2.blur(mask_src, (15, 15))/255  
     # mask_blur = mask_src/255
-
-    # # 先简单修改成上半部分为mask_blur，下半部分为mask_src
-    # mask_new = np.zeros_like(mask_blur)
-    # mask_new[0:256, :] = mask_blur[0:256, :]
-    # mask_new[256:512, :] = mask_src[256:512, :]/255
-    # mask_blur = mask_new
 
     blue_after_transform = blue_after_transform * mask_blur + src_b * (1 - mask_blur)
     green_after_transform = green_after_transform * mask_blur + src_g * (1 - mask_blur)
@@ -184,23 +161,14 @@ def possion(src, dst, parsing):
     return img
 
 
-def get_image(i):
-    lis = glob.glob("/home/yexiaoqi/PycharmPro/zyd/SPADE-Tensorflow-master/dataset/spade_celebA/segmap_ffhq_test/*.png")
-    name = lis[i].split("/")[-1]
-    im2 = cv2.imread("/home/yexiaoqi/PycharmPro/zyd/ffhq_part/" + name)
-    # parsing = cv2.imread("/home/yexiaoqi/PycharmPro/zyd/rawscan_parsing/" + name)
-    full_parsing = cv2.imread("/home/yexiaoqi/PycharmPro/zyd/ffhq_parsing/" + name)
-
-    face, mask = get_face_from_parsing(im2, full_parsing)
-    return im2, mask
-
-
 def hist_match(image_src, mask_src, image_ref, mask_ref):
     # Calculate the matched image
     output_image = match_histograms(image_src, image_ref, mask_src, mask_ref)
 
     return output_image
 
+
+#================================== face swap =========================================
 
 def faceswap(im1, im2, parsing):
     gray = cv2.cvtColor(parsing, cv2.COLOR_BGR2GRAY)
@@ -806,42 +774,6 @@ if __name__ == '__main__':
     # swap rawscan with SEAN
     SEAN_swap()
 
-    # 0324
-    # SEAN_swap2()
 
-    # SEAN_swap3()
 
-    # 0331
-    # SEAN_swap5()
-    # SEAN_swap6()
-
-    # 0425
-    # SEAN_swap5()
-
-    # swap rawscan with SEAN with light
-    # SEAN_swap_withlight()
-
-    # generate facescape_front3 dataset
-    # generate_facescape_front3()
-
-    # generate facescape_front3 dataset
-    # generate_facescape_front4()
-
-    # # swap rawscan with SPADE
-    # lis = glob.glob("/home/yexiaoqi/PycharmPro/zyd/SPADE-Tensorflow-master/dataset/spade_celebA/segmap_rawscan/*.png")
-    # for i in range(0, len(lis)):
-    #     name = lis[i].split("/")[-1]
-    #     ref = cv2.imread("/home/yexiaoqi/PycharmPro/zyd/rawscan_normalize/" + name.replace("png", "jpg"))
-    #     src = cv2.imread(
-    #         "/home/yexiaoqi/PycharmPro/zyd/SPADE-Tensorflow-master/results_rawscan/SPADE_spade_celebA_hinge_2multi_4dis_1_1_10_10_0.05_sn_TTUR_more/guide/" + name)
-    #     ref_parsing = cv2.imread("/home/yexiaoqi/PycharmPro/zyd/rawscan_parsing/" + name)
-    #     src_parsing = cv2.imread("/home/yexiaoqi/PycharmPro/zyd/SPADE-Tensorflow-master/dataset/spade_celebA/segmap_rawscan/" + name)
-    #     face_src, mask_src = get_face_from_parsing2(src, src_parsing)
-    #     face_ref, mask_ref = get_face_from_parsing(ref, ref_parsing)
-    #     out = hist_match(src, mask_src, ref, mask_ref)
-    #     # out_possion = possion(ref, out, ref_parsing)
-    #     swap = faceswap2(ref, out, ref_parsing)
-    #
-    #     cv2.imwrite("/home/yexiaoqi/PycharmPro/zyd/SPADE-Tensorflow-master/results_rawscan/hist_match_swap_withneck2/" + name, swap)
-    #     print(i, name)
 
