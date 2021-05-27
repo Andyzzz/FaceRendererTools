@@ -91,6 +91,26 @@ def celeba_label2parsinglabel(label):
     return res
 
 
+def normalize_SEAN(img):
+    scale = 1.1
+    img = cv2.resize(img, (0, 0), fx=scale, fy=scale, interpolation=cv2.INTER_NEAREST)
+    res = []
+
+    if len(img.shape) == 2:
+        res = np.zeros((512, 512), dtype=np.uint8)
+        left = img.shape[0] // 2 - 256
+        top = max(0, img.shape[0] // 2 - 256 - 20)
+        res[:, :] = img[top:top + 512, left:left + 512]
+
+    elif len(img.shape) == 3 and img.shape[2] == 3:
+        res = np.ones((512, 512, 3), dtype=np.uint8) * 255
+        left = img.shape[0] // 2 - 256
+        top = max(0, img.shape[0] // 2 - 256 - 20)
+        res[:, :, :] = img[top:top + 512, left:left + 512, :]
+
+    return res
+
+
 def get_face_from_parsing(im, parsing):
     # only face
     im = im[:, :, ::-1]
